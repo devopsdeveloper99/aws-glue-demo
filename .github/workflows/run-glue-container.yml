@@ -1,4 +1,4 @@
-name: Run AWS Glue Job
+name: Run AWS Glue Job (Local)
 
 on:
   workflow_dispatch:
@@ -11,13 +11,14 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-
-      - name: Run AWS Glue 4.0 Container
+      - name: Pull AWS Glue 4.0 Docker image
         run: |
-          docker run --rm             -v $(pwd)/app/src:/home/glue_user/workspace/scripts             amazon/aws-glue-libs:glue_libs_4.0.0_image_01             /home/glue_user/jupyter/jupyter_start.sh -t GlueSparkSession             python /home/glue_user/workspace/scripts/my_glue_script.py
+          docker pull amazon/aws-glue-libs:glue_libs_4.0.0_image_01
+
+      - name: Run AWS Glue 4.0 Container Locally
+        run: |
+          docker run --rm \
+            -v $(pwd)/app/src:/home/glue_user/workspace/scripts \
+            amazon/aws-glue-libs:glue_libs_4.0.0_image_01 \
+            /home/glue_user/jupyter/jupyter_start.sh -t GlueSparkSession \
+            python /home/glue_user/workspace/scripts/my_glue_script.py
